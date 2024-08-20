@@ -1,15 +1,16 @@
 package com.picpay.wallet.infra
 
+import com.picpay.wallet.builders.AccountBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import kotlin.test.assertEquals
 
-class AccountEntityTest {
+class AccountTest {
 
     @Test
     fun `decreases balance`() {
-        val wallet = AccountEntityBuilder()
+        val wallet = AccountBuilder()
             .apply { this.balance = BigDecimal.valueOf(100) }
             .build()
 
@@ -20,7 +21,7 @@ class AccountEntityTest {
 
     @Test
     fun `increases balance`() {
-        val wallet = AccountEntityBuilder()
+        val wallet = AccountBuilder()
             .apply { this.balance = BigDecimal.valueOf(100) }
             .build()
 
@@ -31,7 +32,7 @@ class AccountEntityTest {
 
     @Test
     fun `throws exception when balance is less than value`() {
-        val wallet = AccountEntityBuilder().apply { this.balance = BigDecimal.valueOf(10) }.build()
+        val wallet = AccountBuilder().apply { this.balance = BigDecimal.valueOf(10) }.build()
 
         assertThrows<Exception> { wallet.decreaseBalance(BigDecimal.valueOf(11)) }
     }

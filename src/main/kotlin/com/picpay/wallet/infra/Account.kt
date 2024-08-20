@@ -6,8 +6,8 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import java.math.BigDecimal
 
-@Entity(name = "wallets")
-data class TransactionEntity(
+@Entity(name = "accounts")
+data class Account(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
@@ -15,7 +15,7 @@ data class TransactionEntity(
     val balance: BigDecimal,
 ) {
 
-    fun decreaseBalance(value: BigDecimal): TransactionEntity {
+    fun decreaseBalance(value: BigDecimal): Account {
         return if (balance < value) {
             throw Exception("Saldo Insuficiente")
         } else {
