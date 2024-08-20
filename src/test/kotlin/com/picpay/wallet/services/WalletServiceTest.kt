@@ -1,7 +1,7 @@
 package com.picpay.wallet.services
 
-import com.picpay.wallet.infra.WalletEntityBuilder
-import com.picpay.wallet.infra.WalletRepository
+import com.picpay.wallet.infra.AccountEntityBuilder
+import com.picpay.wallet.infra.AccountRepository
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -18,96 +18,96 @@ class WalletServiceTest {
     private lateinit var walletService: WalletService
 
     @MockK
-    private lateinit var walletRepository: WalletRepository
+    private lateinit var accountRepository: AccountRepository
 
     @Test
     fun `decreases balance from wallet when operation is withdraw`() {
-        val wallet = WalletEntityBuilder().apply { this.balance = BigDecimal.valueOf(200) }.build()
-        val walletUpdated = WalletEntityBuilder().apply { this.balance = BigDecimal.valueOf(100) }.build()
+        val wallet = AccountEntityBuilder().apply { this.balance = BigDecimal.valueOf(200) }.build()
+        val walletUpdated = AccountEntityBuilder().apply { this.balance = BigDecimal.valueOf(100) }.build()
         every {
-            walletRepository.getByAccountId(wallet.accountId)
+            accountRepository.getByAccountId(wallet.accountId)
         } returns wallet
         every {
-            walletRepository.save(walletUpdated)
+            accountRepository.save(walletUpdated)
         } returns walletUpdated
 
         walletService.withdraw(wallet.accountId, BigDecimal.valueOf(100))
 
         verify(exactly = 1) {
-            walletRepository.save(walletUpdated)
+            accountRepository.save(walletUpdated)
         }
     }
 
     @Test
     fun `decreases balance from wallet when operation is payment`() {
-        val wallet = WalletEntityBuilder().apply { this.balance = BigDecimal.valueOf(200) }.build()
-        val walletUpdated = WalletEntityBuilder().apply { this.balance = BigDecimal.valueOf(100) }.build()
+        val wallet = AccountEntityBuilder().apply { this.balance = BigDecimal.valueOf(200) }.build()
+        val walletUpdated = AccountEntityBuilder().apply { this.balance = BigDecimal.valueOf(100) }.build()
         every {
-            walletRepository.getByAccountId(wallet.accountId)
+            accountRepository.getByAccountId(wallet.accountId)
         } returns wallet
         every {
-            walletRepository.save(walletUpdated)
+            accountRepository.save(walletUpdated)
         } returns walletUpdated
 
         walletService.payment(wallet.accountId, BigDecimal.valueOf(100))
 
         verify(exactly = 1) {
-            walletRepository.save(walletUpdated)
+            accountRepository.save(walletUpdated)
         }
     }
 
     @Test
     fun `increases balance from wallet when operation is deposit`() {
-        val wallet = WalletEntityBuilder().apply { this.balance = BigDecimal.valueOf(200) }.build()
-        val walletUpdated = WalletEntityBuilder().apply { this.balance = BigDecimal.valueOf(300) }.build()
+        val wallet = AccountEntityBuilder().apply { this.balance = BigDecimal.valueOf(200) }.build()
+        val walletUpdated = AccountEntityBuilder().apply { this.balance = BigDecimal.valueOf(300) }.build()
         every {
-            walletRepository.getByAccountId(wallet.accountId)
+            accountRepository.getByAccountId(wallet.accountId)
         } returns wallet
         every {
-            walletRepository.save(walletUpdated)
+            accountRepository.save(walletUpdated)
         } returns walletUpdated
 
         walletService.deposit(wallet.accountId, BigDecimal.valueOf(100))
 
         verify(exactly = 1) {
-            walletRepository.save(walletUpdated)
+            accountRepository.save(walletUpdated)
         }
     }
 
     @Test
     fun `increases balance from target and decreases balance from source when operation is deposit`() {
-        val sourceWallet = WalletEntityBuilder()
+        val sourceWallet = AccountEntityBuilder()
             .apply { this.balance = BigDecimal.valueOf(200) }
             .build()
-        val targetWallet = WalletEntityBuilder()
+        val targetWallet = AccountEntityBuilder()
             .apply { this.balance = BigDecimal.valueOf(200) }
             .build()
-        val sourceWalletUpdated = WalletEntityBuilder()
+        val sourceWalletUpdated = AccountEntityBuilder()
             .apply { this.balance = BigDecimal.valueOf(100) }
             .build()
-        val targetWalletUpdated = WalletEntityBuilder()
+        val targetWalletUpdated = AccountEntityBuilder()
             .apply { this.balance = BigDecimal.valueOf(300) }
             .build()
         every {
-            walletRepository.getByAccountId(sourceWallet.accountId)
+            accountRepository.getByAccountId(sourceWallet.accountId)
         } returns sourceWallet
         every {
-            walletRepository.getByAccountId(targetWallet.accountId)
+            accountRepository.getByAccountId(targetWallet.accountId)
         } returns targetWallet
         every {
-            walletRepository.save(sourceWalletUpdated)
+            accountRepository.save(sourceWalletUpdated)
         } returns sourceWalletUpdated
         every {
-            walletRepository.save(targetWalletUpdated)
+            accountRepository.save(targetWalletUpdated)
         } returns targetWalletUpdated
 
         walletService.transfer(sourceWallet.accountId, targetWallet.accountId, BigDecimal.valueOf(100))
 
         verify(exactly = 1) {
-            walletRepository.save(sourceWalletUpdated)
+            accountRepository.save(sourceWalletUpdated)
         }
         verify(exactly = 1) {
-            walletRepository.save(targetWalletUpdated)
+            accountRepository.save(targetWalletUpdated)
         }
     }
 }

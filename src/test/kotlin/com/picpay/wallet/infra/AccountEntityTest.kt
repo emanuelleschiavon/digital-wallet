@@ -5,11 +5,11 @@ import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import kotlin.test.assertEquals
 
-class WalletEntityTest {
+class AccountEntityTest {
 
     @Test
     fun `decreases balance`() {
-        val wallet = WalletEntityBuilder()
+        val wallet = AccountEntityBuilder()
             .apply { this.balance = BigDecimal.valueOf(100) }
             .build()
 
@@ -20,7 +20,7 @@ class WalletEntityTest {
 
     @Test
     fun `increases balance`() {
-        val wallet = WalletEntityBuilder()
+        val wallet = AccountEntityBuilder()
             .apply { this.balance = BigDecimal.valueOf(100) }
             .build()
 
@@ -31,7 +31,7 @@ class WalletEntityTest {
 
     @Test
     fun `throws exception when balance is less than value`() {
-        val wallet = WalletEntityBuilder().apply { this.balance = BigDecimal.valueOf(10) }.build()
+        val wallet = AccountEntityBuilder().apply { this.balance = BigDecimal.valueOf(10) }.build()
 
         assertThrows<Exception> { wallet.decreaseBalance(BigDecimal.valueOf(11)) }
     }

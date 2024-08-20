@@ -1,6 +1,6 @@
 package com.picpay.wallet.inbound
 
-import com.picpay.wallet.infra.WalletEntityBuilder
+import com.picpay.wallet.infra.AccountEntityBuilder
 import com.picpay.wallet.services.WalletService
 import io.mockk.Runs
 import io.mockk.every
@@ -27,7 +27,7 @@ class WalletControllerTest {
 
     @Test
     fun `withdraws money`() {
-        val wallet = WalletEntityBuilder().build()
+        val wallet = AccountEntityBuilder().build()
         every {
             walletService.withdraw(wallet.accountId, amount)
         } just Runs
@@ -41,7 +41,7 @@ class WalletControllerTest {
 
     @Test
     fun `deposits money`() {
-        val wallet = WalletEntityBuilder().build()
+        val wallet = AccountEntityBuilder().build()
         every {
             walletService.deposit(wallet.accountId, amount)
         } just Runs
@@ -55,7 +55,7 @@ class WalletControllerTest {
 
     @Test
     fun `pay money`() {
-        val wallet = WalletEntityBuilder().build()
+        val wallet = AccountEntityBuilder().build()
         every {
             walletService.payment(wallet.accountId, amount)
         } just Runs
@@ -69,8 +69,8 @@ class WalletControllerTest {
 
     @Test
     fun `transfer money`() {
-        val sourceWallet = WalletEntityBuilder().build()
-        val targetWallet = WalletEntityBuilder().build()
+        val sourceWallet = AccountEntityBuilder().build()
+        val targetWallet = AccountEntityBuilder().build()
         val request = TransferRequest(targetWallet.accountId, amount)
         every {
             walletService.transfer(sourceWallet.accountId, targetWallet.accountId, amount)

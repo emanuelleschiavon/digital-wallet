@@ -1,46 +1,46 @@
 package com.picpay.wallet.services
 
-import com.picpay.wallet.infra.WalletRepository
+import com.picpay.wallet.infra.AccountRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
 @Service
 class WalletService(
-    private val walletRepository: WalletRepository,
+    private val accountRepository: AccountRepository,
 ) {
 
     @Transactional
     fun withdraw(accountId: String, value: BigDecimal) {
-        return walletRepository.getByAccountId(accountId)
+        return accountRepository.getByAccountId(accountId)
             .decreaseBalance(value)
-            .let { walletRepository.save(it) }
+            .let { accountRepository.save(it) }
         // emite evendo
     }
 
     @Transactional
     fun payment(accountId: String, value: BigDecimal) {
-        return walletRepository.getByAccountId(accountId)
+        return accountRepository.getByAccountId(accountId)
             .decreaseBalance(value)
-            .let { walletRepository.save(it) }
+            .let { accountRepository.save(it) }
         // emite evendo
     }
 
     @Transactional
     fun deposit(accountId: String, value: BigDecimal) {
-        walletRepository.getByAccountId(accountId)
+        accountRepository.getByAccountId(accountId)
             .increaseBalance(value)
-            .let { walletRepository.save(it) }
+            .let { accountRepository.save(it) }
         // emite evendo
     }
 
     @Transactional
     fun transfer(sourceAccountId: String, targetAccountId: String, value: BigDecimal) {
-        val sourceWallet = walletRepository.getByAccountId(sourceAccountId)
-        val targetWallet = walletRepository.getByAccountId(targetAccountId)
+        val sourceWallet = accountRepository.getByAccountId(sourceAccountId)
+        val targetWallet = accountRepository.getByAccountId(targetAccountId)
 
-        walletRepository.save(sourceWallet.decreaseBalance(value))
-        walletRepository.save(targetWallet.increaseBalance(value))
+        accountRepository.save(sourceWallet.decreaseBalance(value))
+        accountRepository.save(targetWallet.increaseBalance(value))
         //emite evento
     }
 }

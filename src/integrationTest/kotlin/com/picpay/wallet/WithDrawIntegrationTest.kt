@@ -2,8 +2,8 @@ package com.picpay.wallet
 
 import com.google.gson.Gson
 import com.picpay.wallet.inbound.WalletRequest
-import com.picpay.wallet.infra.WalletEntityBuilder
-import com.picpay.wallet.infra.WalletRepository
+import com.picpay.wallet.infra.AccountEntityBuilder
+import com.picpay.wallet.infra.AccountRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,23 +24,23 @@ class WithDrawIntegrationTest : TestContainerConfiguration() {
     private lateinit var mockMvc: MockMvc
 
     @Autowired
-    private lateinit var walletRepository: WalletRepository
+    private lateinit var accountRepository: AccountRepository
 
     @BeforeEach
     fun cleanUp() {
-        walletRepository.deleteAll()
+        accountRepository.deleteAll()
     }
 
     @Test
     fun `decreases balance when it withdraws money`() {
-        val wallet = WalletEntityBuilder()
+        val wallet = AccountEntityBuilder()
             .apply {
                 this.balance = BigDecimal.valueOf(400)
                 this.accountId = "001"
                 this.id = 1
             }
             .build()
-        walletRepository.save(wallet)
+        accountRepository.save(wallet)
         val request = WalletRequest(BigDecimal.valueOf(400))
 
         mockMvc.perform(
@@ -51,7 +51,7 @@ class WithDrawIntegrationTest : TestContainerConfiguration() {
             .andExpect(MockMvcResultMatchers.status().isOk())
 //            .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("00"))
 
-        val result = walletRepository.getReferenceById(wallet.id)
+        val result = accountRepository.getReferenceById(wallet.id)
         assertEquals(BigDecimal.ZERO, result.balance)
     }
 }

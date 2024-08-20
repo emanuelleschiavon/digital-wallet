@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface WalletRepository : JpaRepository<WalletEntity, Long> {
-    fun getByAccountId(accountId: String): WalletEntity
+interface AccountRepository : JpaRepository<AccountEntity, Long> {
+    fun getByAccountId(accountId: String): AccountEntity
 }
