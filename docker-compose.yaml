@@ -4,6 +4,11 @@ services:
       context: .
     ports:
       - '8080:8080'
+    depends_on:
+      localstack:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
   postgres:
     image: postgres:latest
     ports:
@@ -13,14 +18,15 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
   localstack:
-    image: localstack/localstack:0.12.15
+    image: localstack/localstack:latest
     container_name: sns
     ports:
       - '4566:4566'
     environment:
-      - DEFAULT_REGION=us-east-1
       - SERVICES=sns
       - DEBUG=1
-      - DATA_DIR=/tmp/localstack/data
+      - AWS_ACCESS_KEY_ID=access-key
+      - AWS_SECRET_ACCESS_KEY=secret-key
     volumes:
-      - '/var/run/docker.sock:/var/run/docker.sock'
+      - ./scripts/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
+      - /var/run/docker.sock:/var/run/docker.sock

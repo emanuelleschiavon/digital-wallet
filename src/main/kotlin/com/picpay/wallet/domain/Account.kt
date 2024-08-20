@@ -1,19 +1,17 @@
-package com.picpay.wallet.infra
+package com.picpay.wallet.domain
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import java.io.Serializable
 import java.math.BigDecimal
 
 @Entity(name = "accounts")
 data class Account(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long = 0,
-    val accountId: String,
+    @Id val accountId: String,
     val balance: BigDecimal,
-) {
+) : Serializable {
 
     fun decreaseBalance(value: BigDecimal): Account {
         return if (balance < value) {

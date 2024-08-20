@@ -1,6 +1,6 @@
 -- Apenas para testes
-INSERT INTO accounts (id,account_id,balance) VALUES ( 1, '123', 600 );
-INSERT INTO accounts (id,account_id,balance) VALUES ( 2, '234', 200 );
-INSERT INTO accounts (id,account_id,balance) VALUES ( 3, '456', 100 );
-INSERT INTO accounts (id,account_id,balance) VALUES ( 4, '267', 300 );
-INSERT INTO accounts (id,account_id,balance) VALUES ( 5, '876', 900 );
+INSERT INTO accounts (account_id,balance) VALUES ( '123', 600 );
+INSERT INTO accounts (account_id,balance) VALUES ( '234', 200 );
+INSERT INTO accounts (account_id,balance) VALUES ( '456', 100 );
+INSERT INTO accounts (account_id,balance) VALUES ( '267', 300 );
+INSERT INTO accounts (account_id,balance) VALUES ( '876', 900 );

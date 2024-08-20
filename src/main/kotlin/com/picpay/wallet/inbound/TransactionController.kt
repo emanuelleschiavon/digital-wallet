@@ -1,6 +1,6 @@
 package com.picpay.wallet.inbound
 
-import com.picpay.wallet.services.TransactionService
+import com.picpay.wallet.domain.services.TransactionService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -16,15 +16,15 @@ class TransactionController(
     fun withdraw(@RequestBody request: TransactionRequest) =
         transactionService.withdraw(request)
 
-    @PostMapping("/{accountId}/deposit")
+    @PostMapping("/deposit")
     fun deposit(@RequestBody request: TransactionRequest) =
         transactionService.deposit(request)
 
-    @PostMapping("/{accountId}/payment")
+    @PostMapping("/payment")
     fun payment(@RequestBody request: TransactionRequest) =
         transactionService.payment(request)
 
-    @PostMapping("/{sourceAccountId}/transfer")
+    @PostMapping("/transfer")
     fun transfer(@RequestBody request: TransactionTransferRequest) =
         transactionService.transfer(request)
 }

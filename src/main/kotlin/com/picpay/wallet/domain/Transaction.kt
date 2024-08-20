@@ -1,11 +1,8 @@
-package com.picpay.wallet.infra
+package com.picpay.wallet.domain
 
 import com.picpay.wallet.inbound.TransactionRequest
 import com.picpay.wallet.inbound.TransactionTransferRequest
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -17,41 +14,43 @@ data class Transaction(
     val type: TransactionType,
     val amount: BigDecimal,
     val date: LocalDateTime,
-    val sourceAccountId: String,
     val targetAccountId: String? = null,
+    @ManyToOne
+    @JoinColumn(name = "source_account_id", nullable = false)
+    val sourceAccount: Account,
 ) {
 
     companion object {
-        fun withDraw(request: TransactionRequest) =
+        fun withdraw(account: Account, request: TransactionRequest) =
             Transaction(
                 type = TransactionType.WITHDRAW,
                 amount = request.value,
                 date = request.date,
-                sourceAccountId = request.sourceAccountId,
+                sourceAccount = account,
             )
 
-        fun deposit(request: TransactionRequest) =
+        fun deposit(account: Account, request: TransactionRequest) =
             Transaction(
                 type = TransactionType.DEPOSIT,
                 amount = request.value,
                 date = request.date,
-                sourceAccountId = request.sourceAccountId,
+                sourceAccount = account,
             )
 
-        fun payment(request: TransactionRequest) =
+        fun payment(account: Account, request: TransactionRequest) =
             Transaction(
                 type = TransactionType.PAYMENT,
                 amount = request.value,
                 date = request.date,
-                sourceAccountId = request.sourceAccountId,
+                sourceAccount = account,
             )
 
-        fun transfer(request: TransactionTransferRequest) =
+        fun transfer(sourceAccount: Account, request: TransactionTransferRequest) =
             Transaction(
                 type = TransactionType.TRANSFER,
                 amount = request.value,
                 date = request.date,
-                sourceAccountId = request.sourceAccountId,
+                sourceAccount = sourceAccount,
                 targetAccountId = request.targetAccountId,
             )
     }

@@ -4,8 +4,10 @@ import com.picpay.wallet.builders.AccountBuilder
 import com.picpay.wallet.builders.TransactionBuilder
 import com.picpay.wallet.builders.TransactionRequestBuilder
 import com.picpay.wallet.builders.TransactionTransferRequestBuilder
+import com.picpay.wallet.domain.services.TransactionService
 import com.picpay.wallet.infra.AccountRepository
-import com.picpay.wallet.infra.Transaction.TransactionType
+import com.picpay.wallet.domain.Transaction.TransactionType
+import com.picpay.wallet.infra.TransactionPublisher
 import com.picpay.wallet.infra.TransactionRepository
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
@@ -29,11 +31,14 @@ class TransactionServiceTest {
     @MockK
     private lateinit var transactionRepository: TransactionRepository
 
+    @MockK
+    private lateinit var transactionPublisher: TransactionPublisher
+
     private val account = AccountBuilder().apply { this.balance = BigDecimal.valueOf(200) }.build()
     private val request = TransactionRequestBuilder().build()
 
     @Test
-    fun `decreases balance from wallet when operation is withdraw`() {
+    fun `decreases balance from account when operation is withdraw`() {
         val accountUpdated = AccountBuilder()
             .apply { this.balance = BigDecimal.valueOf(100) }
             .build()
@@ -41,11 +46,13 @@ class TransactionServiceTest {
             .apply {
                 this.type = TransactionType.WITHDRAW
                 this.date = request.date
+                this.sourceAccount = accountUpdated
             }
             .build()
-        every { accountRepository.getByAccountId(account.accountId) } returns account
+        every { accountRepository.getReferenceById(account.accountId) } returns account
         every { accountRepository.save(accountUpdated) } returns accountUpdated
         every { transactionRepository.save(transaction) } returns transaction
+        every { transactionPublisher.publish(transaction) } returns transaction
 
         val result = transactionService.withdraw(request)
 
@@ -53,56 +60,60 @@ class TransactionServiceTest {
     }
 
     @Test
-    fun `decreases balance from wallet when operation is payment`() {
-        val walletUpdated = AccountBuilder().apply { this.balance = BigDecimal.valueOf(100) }.build()
+    fun `decreases balance from account when operation is payment`() {
+        val accountUpdated = AccountBuilder().apply { this.balance = BigDecimal.valueOf(100) }.build()
         val transaction = TransactionBuilder()
             .apply {
                 this.type = TransactionType.PAYMENT
                 this.date = request.date
+                this.sourceAccount = accountUpdated
             }
             .build()
-        every { accountRepository.getByAccountId(account.accountId) } returns account
-        every { accountRepository.save(walletUpdated) } returns walletUpdated
+        every { accountRepository.getReferenceById(account.accountId) } returns account
+        every { accountRepository.save(accountUpdated) } returns accountUpdated
         every { transactionRepository.save(transaction) } returns transaction
+        every { transactionPublisher.publish(transaction) } returns transaction
 
         transactionService.payment(request)
 
-        verify(exactly = 1) { accountRepository.save(walletUpdated) }
+        verify(exactly = 1) { accountRepository.save(accountUpdated) }
         verify(exactly = 1) { transactionRepository.save(transaction) }
 
     }
 
     @Test
-    fun `increases balance from wallet when operation is deposit`() {
-        val walletUpdated = AccountBuilder().apply { this.balance = BigDecimal.valueOf(300) }.build()
+    fun `increases balance from account when operation is deposit`() {
+        val accountUpdated = AccountBuilder().apply { this.balance = BigDecimal.valueOf(300) }.build()
         val transaction = TransactionBuilder()
             .apply {
                 this.type = TransactionType.DEPOSIT
                 this.date = request.date
+                this.sourceAccount = accountUpdated
             }
             .build()
-        every { accountRepository.getByAccountId(account.accountId) } returns account
-        every { accountRepository.save(walletUpdated) } returns walletUpdated
+        every { accountRepository.getReferenceById(account.accountId) } returns account
+        every { accountRepository.save(accountUpdated) } returns accountUpdated
         every { transactionRepository.save(transaction) } returns transaction
+        every { transactionPublisher.publish(transaction) } returns transaction
 
         transactionService.deposit(request)
 
-        verify(exactly = 1) { accountRepository.save(walletUpdated) }
+        verify(exactly = 1) { accountRepository.save(accountUpdated) }
         verify(exactly = 1) { transactionRepository.save(transaction) }
     }
 
     @Test
-    fun `increases balance from target and decreases balance from source when operation is deposit`() {
-        val targetWallet = AccountBuilder()
+    fun `increases balance from target account and decreases balance from source account when operation is deposit`() {
+        val targetAccount = AccountBuilder()
             .apply {
                 this.balance = BigDecimal.valueOf(200)
                 this.accountId = "456"
             }
             .build()
-        val sourceWalletUpdated = AccountBuilder()
+        val sourceAccountUpdated = AccountBuilder()
             .apply { this.balance = BigDecimal.valueOf(100) }
             .build()
-        val targetWalletUpdated = AccountBuilder()
+        val targetAccountUpdated = AccountBuilder()
             .apply {
                 this.balance = BigDecimal.valueOf(300)
                 this.accountId = "456"
@@ -112,20 +123,22 @@ class TransactionServiceTest {
         val transaction = TransactionBuilder()
             .apply {
                 this.type = TransactionType.TRANSFER
-                this.targetAccountId = targetWallet.accountId
+                this.targetAccountId = targetAccount.accountId
                 this.date = transferRequest.date
+                this.sourceAccount = account
             }
             .build()
-        every { accountRepository.getByAccountId(account.accountId) } returns account
-        every { accountRepository.getByAccountId(targetWallet.accountId) } returns targetWallet
-        every { accountRepository.save(sourceWalletUpdated) } returns sourceWalletUpdated
-        every { accountRepository.save(targetWalletUpdated) } returns targetWalletUpdated
+        every { accountRepository.getReferenceById(account.accountId) } returns account
+        every { accountRepository.getReferenceById(targetAccount.accountId) } returns targetAccount
+        every { accountRepository.save(sourceAccountUpdated) } returns sourceAccountUpdated
+        every { accountRepository.save(targetAccountUpdated) } returns targetAccountUpdated
         every { transactionRepository.save(transaction) } returns transaction
+        every { transactionPublisher.publish(transaction) } returns transaction
 
         transactionService.transfer(transferRequest)
 
-        verify(exactly = 1) { accountRepository.save(sourceWalletUpdated) }
-        verify(exactly = 1) { accountRepository.save(targetWalletUpdated) }
+        verify(exactly = 1) { accountRepository.save(sourceAccountUpdated) }
+        verify(exactly = 1) { accountRepository.save(targetAccountUpdated) }
         verify(exactly = 1) { transactionRepository.save(transaction) }
     }
 }
