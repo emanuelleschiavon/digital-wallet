@@ -1,4 +1,11 @@
 services:
+  wallet-api:
+    build:
+      context: .
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
   postgres:
     image: postgres:latest
     ports:
@@ -7,3 +14,15 @@ services:
       POSTGRES_DB: wallet
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
+  localstack:
+    image: localstack/localstack:0.12.15
+    container_name: sns
+    ports:
+      - '4566:4566'
+    environment:
+      - DEFAULT_REGION=us-east-1
+      - SERVICES=sns
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
