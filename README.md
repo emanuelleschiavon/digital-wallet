@@ -36,3 +36,7 @@ Por fim, rode os testes:
 ```
 ./gradlew integrationTest
 ```
+
+### Arquitetura
+
+![picpay.drawio.png](picpay.drawio.png)
