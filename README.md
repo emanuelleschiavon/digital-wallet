@@ -1,17 +1,38 @@
-### Building
+### Realizando o processo de build
 
 ```
 ./gradlew clean build
 ```
 
 
-### Running
+### Rodando a aplicação
 
-First, run the dependency database with command:
+Primeiro, deve-se subir as dependências do projeto:
 ```
 docker-compose up -d postgres
 ```
-After this, run the application:
+Depois disso, rode a aplicação:
 ```
 ./gradlew bootRun
+```
+
+### Rodando testes unitários
+
+Para rodar os testes unitários:
+
+```
+./gradlew test
+```
+
+### Rodando os testes de integração
+Para rodar os testes de integração, primeiro certifique-se que as dependências do serviço não estão rodando:
+
+```
+docker-compose down
+```
+
+Por fim, rode os testes:
+
+```
+./gradlew integrationTest
 ```
