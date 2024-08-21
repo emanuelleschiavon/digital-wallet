@@ -7,13 +7,10 @@
 
 ### Rodando a aplicação
 
-Primeiro, deve-se subir as dependências do projeto:
+Depois de fazer o build da aplicação, rode para subir a aplicação e suas dependências:
+
 ```
-docker-compose up -d postgres
-```
-Depois disso, rode a aplicação:
-```
-./gradlew bootRun
+docker-compose up -d
 ```
 
 ### Rodando testes unitários
